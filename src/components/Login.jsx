@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useAxiosPublic from "./useAxiosPublic";
 import Swal from "sweetalert2";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { useState } from "react";
 const Login = () => {
     const [user,setUser] = useState(false);
     const [userInfo,setUserInfo] = useState(null);
+    const navigate = useNavigate();
     const axiosPublic = useAxiosPublic();
     const handleSubmit = e => {
         e.preventDefault();
@@ -23,6 +24,7 @@ const Login = () => {
                 .then(res => {
                     localStorage.setItem('token',res.data.token)
                     setUser(true);
+                    navigate('/about')
                 })
                 .catch(error => {
                     console.log(error);
