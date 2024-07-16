@@ -21,7 +21,9 @@ const Register = () => {
                     name,
                     email,
                     number,
-                    pin
+                    pin,
+                    role : 'user',
+                    available : true
                 }
                 axiosPublic.post('/users',user)
                 .then(res => {
@@ -33,10 +35,15 @@ const Register = () => {
                             showConfirmButton: false,
                             timer: 1500
                           });
+                    }else{
+                        return Swal.fire({
+                            position: "center",
+                            icon: "error",
+                            title: `${error}`,
+                            showConfirmButton: false,
+                            timer: 1500
+                          });
                     }
-                })
-                .catch(error => {
-                    console.log(error);
                 })
             }else{
                 setError('Pin Must be 5 digits');

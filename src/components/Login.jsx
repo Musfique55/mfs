@@ -1,23 +1,73 @@
 import { Link } from "react-router-dom";
 import useAxiosPublic from "./useAxiosPublic";
+import Swal from "sweetalert2";
+import { useState } from "react";
 
 
 
 const Login = () => {
+    const [user,setUser] = useState(false);
+    const [userInfo,setUserInfo] = useState(null);
     const axiosPublic = useAxiosPublic();
     const handleSubmit = e => {
         e.preventDefault();
         const form = e.target;
         const emailMobile = form.emailMobile.value;
         const pin = form.pin.value;
-        const user = {emailMobile,pin}
+        const user = {emailMobile,pin};
+        setUserInfo(user);
         axiosPublic.post('/login',user)
         .then(res => {
-            console.log(res.data);
+            if(res.data === true){
+                axiosPublic.post('/jwt',user)
+                .then(res => {
+                    localStorage.setItem('token',res.data.token)
+                    setUser(true);
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+                return Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Logged In Successfully",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }else{
+                return Swal.fire({
+                    position: "center",
+                    icon: "error",
+                    title: `Error Occured`,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
         })
-        .catch(error => {
-            console.log(error);
+    }
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        const {emailMobile} = userInfo;
+        if(emailMobile.includes('@')){
+            const currentUser = {
+                emailMobile,
+                available : false
+            }
+                axiosPublic.post('/logout',currentUser)
+                .then(() => {
+                 setUser(false);
+            })
+        }else{
+            const currentUser = {
+                emailMobile,
+                available : false
+            }
+            axiosPublic.post('/logout',currentUser)
+            .then(() => {
+            setUser(false);
         })
+        }
+        
     }
     return (
         <div className="flex flex-col items-center">
@@ -34,6 +84,8 @@ const Login = () => {
                 <p className="font-medium text-lg text-[#5A5C5E] my-7">
                     Do Not Have an Account? <Link to={'/register'}><span className="font-semibold text-black">Sign up</span></Link>
                 </p>
+
+                {user ? <button onClick={handleLogout}>Logout</button> : ''}
             </div>
         </div>
     );
