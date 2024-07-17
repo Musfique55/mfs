@@ -10,7 +10,7 @@ const About = () => {
             setData(res.data)
         })
     },[axiosSecure])
-    console.log(data);
+    
     return (
         <div>
             About
